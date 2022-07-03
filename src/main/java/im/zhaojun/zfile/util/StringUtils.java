@@ -12,8 +12,10 @@ import java.net.URL;
  * @author zhaojun
  */
 public class StringUtils {
-
-
+    /** 圆点分割符号 */
+    public static final String DOT_SPLIT = ".";
+    /** 横线分割符号 */
+    public static final String LINE_SPLIT = "-";
     public static final char DELIMITER = '/';
 
     public static final String DELIMITER_STR = "/";

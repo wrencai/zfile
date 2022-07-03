@@ -37,9 +37,9 @@ public class ZFileConstant {
     public static String README_FILE_NAME = "readme.md";
 
     /**
-     * 密码文件
+     * 密码文件，用于校验需要密码访问的文件夹密码，文件夹中只要包含此名称文件，即说明文件夹需要密码访问
      */
-    public static String PASSWORD_FILE_NAME = "password.txt";
+    public static String PASSWORD_FILE_NAME = "ZFILEPASSWORDCHECK.PWD";
 
     /**
      * 最大支持文件大小为 ? MB 的音乐文件解析封面, 歌手等信息.

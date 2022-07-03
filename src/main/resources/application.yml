@@ -14,7 +14,8 @@ zfile:
     timeout: 1800
   constant:
     readme: readme.md
-    password: password.txt
+    # 加密访问的文件夹存储密码的文件名称
+    password: ZFILEPASSWORDCHECK.PWD
   preview:
     audio:
       maxFileSizeMb: 5
@@ -37,11 +38,15 @@ server:
     context-path: ''
   tomcat:
     threads:
-      max: 20
+      max: 30
   compression:
     enabled: true
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      maxRequestSize: 1000MB
   h2:
     console:
       settings:

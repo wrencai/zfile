@@ -58,7 +58,7 @@ public class DriveContext implements ApplicationContextAware {
 
 
     /**
-     * 初始化指定驱动器的 Service, 添加到上下文环境中.
+     * 驱动器的 Service添加到上下文环境中
      *
      * @param   driveId
      *          驱动器 ID.
@@ -69,6 +69,7 @@ public class DriveContext implements ApplicationContextAware {
             if (log.isDebugEnabled()) {
                 log.debug("尝试初始化驱动器, driveId: {}", driveId);
             }
+            // 尝试初始化，初始化只要不报错就视为服务可用，具体每次使用时还需要重新初始化
             baseFileService.init(driveId);
             if (log.isDebugEnabled()) {
                 log.debug("初始化驱动器成功, driveId: {}", driveId);
@@ -88,6 +89,8 @@ public class DriveContext implements ApplicationContextAware {
      */
     public AbstractBaseFileService get(Integer driveId) {
         AbstractBaseFileService abstractBaseFileService = drivesServiceMap.get(driveId);
+        // 配置当前用户的driveId，多用户同时访问时driveId可能不同
+        abstractBaseFileService.init(driveId);
         if (abstractBaseFileService == null) {
             throw new InvalidDriveException("此驱动器不存在或初始化失败, 请检查后台参数配置");
         }

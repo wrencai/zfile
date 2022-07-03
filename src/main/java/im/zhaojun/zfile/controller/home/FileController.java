@@ -11,6 +11,7 @@ import im.zhaojun.zfile.model.dto.FileItemDTO;
 import im.zhaojun.zfile.model.dto.FileListDTO;
 import im.zhaojun.zfile.model.dto.SystemFrontConfigDTO;
 import im.zhaojun.zfile.model.entity.DriveConfig;
+import im.zhaojun.zfile.model.enums.FileTypeEnum;
 import im.zhaojun.zfile.model.enums.StorageTypeEnum;
 import im.zhaojun.zfile.model.support.ResultBean;
 import im.zhaojun.zfile.model.support.VerifyResult;
@@ -23,18 +24,14 @@ import im.zhaojun.zfile.util.HttpUtil;
 import im.zhaojun.zfile.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * 前台文件管理
@@ -238,6 +235,55 @@ public class FileController {
                         || ZFileConstant.README_FILE_NAME.equals(fileItem.getName())
                         || filterConfigService.filterResultIsHidden(driveId, StringUtils.concatUrl(fileItem.getPath(), fileItem.getName()))
         );
+    }
+
+    /**
+     * 文件上传
+     * @param driveId
+     * @param path
+     * @param password
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/upload/{driveId}")
+    public ResultBean upload(@PathVariable(name = "driveId") Integer driveId,
+                           @RequestParam(defaultValue = "/") String path,
+                           @RequestParam(required = false) String password,
+                           @RequestParam MultipartFile file) throws Exception {
+        AbstractBaseFileService fileService = driveContext.get(driveId);
+        //获取原文件名
+        String originalFilename = file.getOriginalFilename();
+        log.info("上传文件：driveId: {}, path: {}, fileOriginName: {}", driveId, path, originalFilename);
+        FileItemDTO fileInfo = new FileItemDTO();
+        fileInfo.setName(originalFilename);
+        fileInfo.setPath(path);
+        FileItemDTO finalFile = fileService.addFile(file.getInputStream(), fileInfo);
+
+        return ResultBean.successData(finalFile);
+    }
+
+    /**
+     *  新建文件夹
+     * @param driveId
+     * @param path
+     * @param password
+     * @param name
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/mkdir/{driveId}")
+    public ResultBean mkdir(@PathVariable(name = "driveId") Integer driveId,
+                           @RequestParam(defaultValue = "/") String path,
+                           @RequestParam(required = false) String password,
+                           @RequestParam String name) throws Exception {
+        log.info("新建文件夹：driveId: {}, path: {}, name: {}", driveId, path, name);
+        AbstractBaseFileService fileService = driveContext.get(driveId);
+        FileItemDTO dirInfo = new FileItemDTO();
+        dirInfo.setType(FileTypeEnum.FOLDER);
+        dirInfo.setName(name);
+        dirInfo.setPath(path);
+        FileItemDTO finalDir = fileService.mkDir(dirInfo);
+        return ResultBean.successData(finalDir);
     }
 
 }
